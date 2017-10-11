@@ -52,6 +52,29 @@ Power: 1, Dim: 255
 
 ### Dim a lamp to 50% brightness
 
+```bash
+$ ./tradfri -dim -device -id 65537 -value 128
+Dim level at start: 202, dim level at end: 128
+```
+
+### Dim a lamp to 80ish% brightness in 5 steps over 10 seconds
+```bash
+$ ./tradfri -dim -device -id 65537 -value 224 -steps 5 -period 10
+dimming in 5 2 second intervals, difference per interval 19
+ new dim level 147
+Dim level at start: 128, dim level at end: 147
+ new dim level 166
+Dim level at start: 147, dim level at end: 166
+ new dim level 185
+Dim level at start: 166, dim level at end: 185
+ new dim level 204
+Dim level at start: 185, dim level at end: 204
+ new dim level 223
+Dim level at start: 204, dim level at end: 223
+ new dim level 224
+Dim level at start: 223, dim level at end: 224
+```
+
 
 
 
