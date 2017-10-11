@@ -64,12 +64,18 @@ type tradfri_cfg struct {
 var (
 	gateway     = flag.String("gateway", "127.0.0.1", "Address of Tradfri gateway.")
 	key         = flag.String("key", "deadbeef", "API key to access gateway.")
-	action      = flag.String("action", "status", "action to take [dim|status|power]).")
-	target      = flag.Int("target", 0, "Target value (0-100 for dim, 0 or 1 for power).")
-	target_id   = flag.Int("id", 65537, "Device or Group ID.")
+	status      = flag.Bool("status", false, "Show status of all Tradfri devices.")
+	power       = flag.Bool("power", false, "Modify power state of a device or group.")
+	dim         = flag.Bool("dim", false, "Dim a device or group.")
+	color       = flag.Bool("color", false, "Set color for a device or group.")
+	device      = flag.Bool("device", false, "Talk to a device")
+	group       = flag.Bool("group", false, "Talk to a group")
+	value       = flag.Int("value", -1, "Target value (0-100 for dim, 0 or 1 for power).")
+	target_id   = flag.Int("id", -1, "Device or Group ID.")
 	target_name = flag.String("name", "", "Device or Group name")
-	steps       = flag.Int("steps", 10, "Number of intermediate steps for dim action.")
-	period      = flag.Int("period", 60, "Time period in seconds to run dim action over.")
+	period      = flag.Int("period", 0,
+		"Dim period in seconds. Will dim immediately if set to 0.")
+	steps = flag.Int("steps", 10, "Number of intermediate steps for dim action.")
 )
 
 // process flags
@@ -94,28 +100,9 @@ func check(e error) {
 
 func tradfri_conn(address string, key string) canopus.Connection {
 	var tradfri_gw = fmt.Sprintf("%s:5684", address)
-	fmt.Println("Connecting to tradfri gateway... ")
 	conn, err := canopus.DialDTLS(tradfri_gw, "", key)
 	check(err)
-	fmt.Println("connected")
 	return conn
-}
-
-func list_device_ids(conn canopus.Connection) device_ids {
-	var device_id_list device_ids
-
-	// setup request for device ids
-	req := canopus.NewRequest(canopus.MessageConfirmable, canopus.Get)
-	req.SetStringPayload("")
-	req.SetRequestURI("/15001")
-
-	// request device ids
-	fmt.Print("Looking for devices... ")
-	resp, err := conn.Send(req)
-	check(err)
-
-	json.Unmarshal([]byte(resp.GetMessage().GetPayload().String()), &device_id_list)
-	return device_id_list
 }
 
 func list_group_ids(conn canopus.Connection) group_ids {
@@ -135,33 +122,73 @@ func list_group_ids(conn canopus.Connection) group_ids {
 	return group_id_list
 }
 
-func get_group_info(group_id int, conn canopus.Connection) {
+func list_groups(group_id_list group_ids, conn canopus.Connection) {
+	// enumerating group information
+	fmt.Println("enumerating:")
+	for _, group := range group_id_list {
+		group_info(group, conn)
+		// sleep for a while to avoid flood protection
+		time.Sleep(500 * time.Millisecond)
+	}
+}
+
+func group_description(group_id int, conn canopus.Connection) group_desc {
+	var desc group_desc
 	req := canopus.NewRequest(canopus.MessageConfirmable, canopus.Get)
 	req.SetStringPayload("")
 	ru := fmt.Sprintf("/15004/%v", group_id)
 	req.SetRequestURI(ru)
 	dresp, err := conn.Send(req)
 	check(err)
-
 	// output basic device information
-	var desc group_desc
 	json.Unmarshal([]byte(dresp.GetMessage().GetPayload().String()), &desc)
-	fmt.Printf("ID: %v, Name: %v\n", desc.GroupID, desc.GroupName)
-	fmt.Printf("Power: %v, Dim: %v\n", desc.Power, desc.Dim)
-
+	return desc
 }
 
-func list_groups(group_id_list group_ids, conn canopus.Connection) {
-	// enumerating group information
+func group_info(group_id int, conn canopus.Connection) {
+	desc := group_description(group_id, conn)
+	fmt.Printf("ID: %v, Name: %v\n", desc.GroupID, desc.GroupName)
+	fmt.Printf("Power: %v, Dim: %v\n", desc.Power, desc.Dim)
+}
+
+func group_power(group_id int, conn canopus.Connection) int {
+	desc := group_description(group_id, conn)
+	return desc.Power
+}
+
+func group_dim(group_id int, conn canopus.Connection) int {
+	desc := group_description(group_id, conn)
+	return desc.Dim
+}
+
+func list_device_ids(conn canopus.Connection) device_ids {
+	var device_id_list device_ids
+
+	// setup request for device ids
+	req := canopus.NewRequest(canopus.MessageConfirmable, canopus.Get)
+	req.SetStringPayload("")
+	req.SetRequestURI("/15001")
+
+	// request device ids
+	fmt.Print("Looking for devices... ")
+	resp, err := conn.Send(req)
+	check(err)
+
+	json.Unmarshal([]byte(resp.GetMessage().GetPayload().String()), &device_id_list)
+	return device_id_list
+}
+
+func list_devices(device_id_list device_ids, conn canopus.Connection) {
 	fmt.Println("enumerating:")
-	for _, group := range group_id_list {
-		get_group_info(group, conn)
+	for _, device := range device_id_list {
+		device_info(device, conn)
+
 		// sleep for a while to avoid flood protection
 		time.Sleep(500 * time.Millisecond)
 	}
 }
 
-func get_device_info(device_id int, conn canopus.Connection) {
+func device_description(device_id int, conn canopus.Connection) device_desc {
 	req := canopus.NewRequest(canopus.MessageConfirmable, canopus.Get)
 	req.SetStringPayload("")
 	ru := fmt.Sprintf("/15001/%v", device_id)
@@ -172,6 +199,12 @@ func get_device_info(device_id int, conn canopus.Connection) {
 	// output basic device information
 	var desc device_desc
 	json.Unmarshal([]byte(dresp.GetMessage().GetPayload().String()), &desc)
+	return desc
+}
+
+func device_info(device_id int, conn canopus.Connection) {
+	var desc device_desc
+	desc = device_description(device_id, conn)
 	fmt.Printf("ID: %v, Name; %v, Description: %v\n",
 		desc.DeviceID, desc.DeviceName, desc.Device.DeviceDescription)
 
@@ -186,18 +219,28 @@ func get_device_info(device_id int, conn canopus.Connection) {
 	}
 }
 
-func list_devices(device_id_list device_ids, conn canopus.Connection) {
-	fmt.Println("enumerating:")
-	for _, device := range device_id_list {
-		get_device_info(device, conn)
+func device_power(device_id int, conn canopus.Connection) int {
+	desc := device_description(device_id, conn)
+	// tradfri lamps only have a single light control
+	if len(desc.LightControl) > 0 {
+		return desc.LightControl[0].Power
+	} else {
+		panic("No light control info found1")
+	}
+}
 
-		// sleep for a while to avoid flood protection
-		time.Sleep(500 * time.Millisecond)
+func device_dim(device_id int, conn canopus.Connection) int {
+	desc := device_description(device_id, conn)
+	// tradfri lamps only have a single light control
+	if len(desc.LightControl) > 0 {
+		return desc.LightControl[0].Dim
+	} else {
+		panic("No light control info found1")
 	}
 }
 
 func power_device(device_id int, val int, conn canopus.Connection) {
-	get_device_info(device_id, conn)
+	device_info(device_id, conn)
 	req := canopus.NewRequest(canopus.MessageConfirmable, canopus.Put)
 	payload := fmt.Sprintf("{ \"3311\" : [{ \"5850\" : %v }] }", val)
 	req.SetStringPayload(payload)
@@ -205,11 +248,11 @@ func power_device(device_id int, val int, conn canopus.Connection) {
 	req.SetRequestURI(ru)
 	_, err := conn.Send(req)
 	check(err)
-	get_device_info(device_id, conn)
+	device_info(device_id, conn)
 }
 
 func dim_device(device_id int, val int, conn canopus.Connection) {
-	get_device_info(device_id, conn)
+	device_info(device_id, conn)
 	req := canopus.NewRequest(canopus.MessageConfirmable, canopus.Put)
 	payload := fmt.Sprintf("{ \"3311\" : [{ \"5851\" : %v }] }", val)
 	req.SetStringPayload(payload)
@@ -217,11 +260,11 @@ func dim_device(device_id int, val int, conn canopus.Connection) {
 	req.SetRequestURI(ru)
 	_, err := conn.Send(req)
 	check(err)
-	get_device_info(device_id, conn)
+	device_info(device_id, conn)
 }
 
 func power_group(group_id int, val int, conn canopus.Connection) {
-	get_group_info(group_id, conn)
+	group_info(group_id, conn)
 	req := canopus.NewRequest(canopus.MessageConfirmable, canopus.Put)
 	payload := fmt.Sprintf("{ \"5850\": %d }", val)
 	req.SetStringPayload(payload)
@@ -229,11 +272,11 @@ func power_group(group_id int, val int, conn canopus.Connection) {
 	req.SetRequestURI(ru)
 	_, err := conn.Send(req)
 	check(err)
-	get_group_info(group_id, conn)
+	group_info(group_id, conn)
 }
 
 func dim_group(group_id int, val int, conn canopus.Connection) {
-	get_group_info(group_id, conn)
+	group_info(group_id, conn)
 	req := canopus.NewRequest(canopus.MessageConfirmable, canopus.Put)
 	payload := fmt.Sprintf("{ \"5851\": %d }", val)
 	req.SetStringPayload(payload)
@@ -241,19 +284,153 @@ func dim_group(group_id int, val int, conn canopus.Connection) {
 	req.SetRequestURI(ru)
 	_, err := conn.Send(req)
 	check(err)
-	get_group_info(group_id, conn)
+	group_info(group_id, conn)
+}
+
+func validate_flags() {
+	if !*status && !*power && !*dim && !*color {
+		usage()
+	}
+	if *device && *group {
+		panic("Only one of -device and -group should be set.")
+	}
+	if *device && *target_id == -1 {
+		if len(*target_name) < 1 {
+			panic("Need device id or name to run.")
+		}
+	}
+	if *group && *target_id == -1 {
+		if len(*target_name) < 1 {
+			panic("Need group id or name to run.")
+		}
+	}
 }
 
 func main() {
+	validate_flags()
 	conn := tradfri_conn(*gateway, *key)
-	if *action == "status" {
+	if *status && *target_id == -1 {
 		list_devices(list_device_ids(conn), conn)
 		list_groups(list_group_ids(conn), conn)
 	}
-	if *action == "power" {
-		fmt.Printf("power target %v on id %v", *target, *target_id)
+	if *status && *device {
+		device_info(*target_id, conn)
 	}
-	if *action == "dim" {
-		fmt.Printf("dim target %v on id %v", *target, *target_id)
+	if *status && *group {
+		group_info(*target_id, conn)
+	}
+
+	if *power {
+		if *device && *value != -1 {
+			power_device(*target_id, *value, conn)
+		}
+		if *device && *value == -1 {
+			device_power(*target_id, conn)
+		}
+
+		if *group && *value != -1 {
+			power_group(*target_id, *value, conn)
+		}
+		if *group && *value == -1 {
+			group_power(*target_id, conn)
+		}
+	}
+
+	if *dim && *period == 0 {
+
+		if *device && *value != -1 {
+			dim_device(*target_id, *value, conn)
+		}
+		if *device && *value == -1 {
+			device_dim(*target_id, conn)
+		}
+
+		if device_dim(*target_id, conn) < 13 {
+			fmt.Printf("Minimum brightness reached, turning off device.")
+			power_device(*target_id, 0, conn)
+		}
+
+		if *group && *value != -1 {
+			dim_group(*target_id, *value, conn)
+		}
+		if *group && *value == -1 {
+			group_dim(*target_id, conn)
+		}
+
+		if group_dim(*target_id, conn) < 13 {
+			fmt.Printf("Minimum brightness reached, turning off device.")
+			power_group(*target_id, 0, conn)
+		}
+
+	}
+
+	if *dim && *period > 0 {
+		interval := int(*period / *steps)
+		fmt.Printf("dimming in %v %v second intervals, ", *steps, interval)
+		if *device {
+			current_brightness := device_dim(*target_id, conn)
+			difference := int(*value - current_brightness)
+			difference_per_interval := int(difference / *steps)
+			fmt.Printf("difference per interval %v\n",
+				difference_per_interval)
+			new_dim := current_brightness
+			for i := 0; i <= *steps; i++ {
+				fmt.Printf("Step %v ", i)
+				new_dim += difference_per_interval
+				if new_dim < *value && difference_per_interval < 0 {
+					new_dim = *value
+				}
+				if new_dim > *value && difference_per_interval > 0 {
+					new_dim = *value
+				}
+				if new_dim > 12 && device_power(*target_id, conn) == 0 {
+					fmt.Printf("Turning up dimmer on device that is powered down, powering up ...")
+					power_device(*target_id, 1, conn)
+				}
+				fmt.Printf(" new dim level %v\n", new_dim)
+				dim_device(*target_id, new_dim, conn)
+				time.Sleep(time.Duration(interval) * time.Millisecond)
+			}
+			if device_dim(*target_id, conn) < 12 {
+				fmt.Printf("Minimum brightness reached, turning off device.")
+				power_device(*target_id, 0, conn)
+			}
+		}
+
+		if *group {
+			current_brightness := group_dim(*target_id, conn)
+			difference := int(*value - current_brightness)
+			difference_per_interval := int(difference / *steps)
+			fmt.Printf("difference per interval %v\n",
+				difference_per_interval)
+			new_dim := current_brightness
+			for i := 0; i <= *steps; i++ {
+				fmt.Printf("Step %v ", i)
+				new_dim += difference_per_interval
+				if new_dim < *value && difference_per_interval < 0 {
+					new_dim = *value
+				}
+				if new_dim > *value && difference_per_interval > 0 {
+					new_dim = *value
+				}
+				if new_dim > 12 && group_power(*target_id, conn) == 0 {
+					fmt.Printf("Turning up dimmer on group that is powered down, powering up ...")
+					power_group(*target_id, 1, conn)
+				}
+				fmt.Printf(" new dim level %v\n", new_dim)
+				dim_group(*target_id, new_dim, conn)
+				time.Sleep(time.Duration(interval)*time.Second)
+			}
+			if group_dim(*target_id, conn) < 12 {
+				fmt.Printf("Minimum brightness reached, turning off group.")
+				power_group(*target_id, 0, conn)
+			}
+		}
+	}
+
+	if *color {
+		// TODO(hwa): Add color support when we have lamps that can change color.
+		fmt.Printf("set color to value %v on id %v\n",
+			*value, *target_id)
 	}
 }
