@@ -5,10 +5,11 @@ import (
 	"flag"
 	"fmt"
 	// "github.com/davecgh/go-spew/spew"
-	"github.com/vharitonsky/iniflags"
-	"github.com/zubairhamed/canopus"
 	"os"
 	"time"
+
+	"github.com/vharitonsky/iniflags"
+	"github.com/zubairhamed/canopus"
 )
 
 // types to unmarshal json data from tradfri
