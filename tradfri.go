@@ -345,10 +345,10 @@ func main() {
 			device_dim(*target_id, conn)
 		}
 
-		if device_dim(*target_id, conn) < 13 {
-			fmt.Printf("Minimum brightness reached, turning off device.")
-			power_device(*target_id, 0, conn)
-		}
+		// if device_dim(*target_id, conn) < 13 {
+		//	fmt.Printf("Minimum brightness reached, turning off device.")
+		//	power_device(*target_id, 0, conn)
+		// }
 
 		if *group && *value != -1 {
 			dim_group(*target_id, *value, conn)
@@ -357,10 +357,10 @@ func main() {
 			group_dim(*target_id, conn)
 		}
 
-		if group_dim(*target_id, conn) < 13 {
-			fmt.Printf("Minimum brightness reached, turning off device.")
-			power_group(*target_id, 0, conn)
-		}
+		// if group_dim(*target_id, conn) < 13 {
+		//	fmt.Printf("Minimum brightness reached, turning off device.")
+		//	power_group(*target_id, 0, conn)
+		// }
 
 	}
 
@@ -389,7 +389,7 @@ func main() {
 				}
 				fmt.Printf(" new dim level %v\n", new_dim)
 				dim_device(*target_id, new_dim, conn)
-				time.Sleep(time.Duration(interval) * time.Millisecond)
+				time.Sleep(time.Duration(interval) * time.Second)
 			}
 			if device_dim(*target_id, conn) < 12 {
 				fmt.Printf("Minimum brightness reached, turning off device.")
