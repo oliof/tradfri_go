@@ -149,6 +149,7 @@ func group_info(group_id int, conn canopus.Connection) {
 	desc := group_description(group_id, conn)
 	fmt.Printf("ID: %v, Name: %v\n", desc.GroupID, desc.GroupName)
 	fmt.Printf("Power: %v, Dim: %v\n", desc.Power, desc.Dim)
+	fmt.Printf("Members: %v\n", desc.Num9018.Num15002.Num9003)
 }
 
 func group_power(group_id int, conn canopus.Connection) int {
