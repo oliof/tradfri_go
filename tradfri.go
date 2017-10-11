@@ -45,9 +45,9 @@ type group_desc struct {
 	GroupName string `json:"9001"`
 	Num9002   int    `json:"9002"`
 	GroupID   int    `json:"9003"`
-	Num9018   struct {
-		Num15002 struct {
-			Num9003 []int `json:"9003"`
+	AccessoryLink   struct {
+		LinkedItems struct {
+			DeviceIDs []int `json:"9003"`
 		} `json:"15002"`
 	} `json:"9018"`
 	Num9039 int `json:"9039"`
@@ -149,7 +149,7 @@ func group_info(group_id int, conn canopus.Connection) {
 	desc := group_description(group_id, conn)
 	fmt.Printf("ID: %v, Name: %v\n", desc.GroupID, desc.GroupName)
 	fmt.Printf("Power: %v, Dim: %v\n", desc.Power, desc.Dim)
-	fmt.Printf("Members: %v\n", desc.Num9018.Num15002.Num9003)
+	fmt.Printf("Members: %v\n", desc.AccessoryLink.LinkedItems.DeviceIDs)
 }
 
 func group_power(group_id int, conn canopus.Connection) int {
