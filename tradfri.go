@@ -258,7 +258,7 @@ func power_device(device_id int, val int, conn canopus.Connection) {
 }
 
 func dim_device(device_id int, val int, conn canopus.Connection) {
-	device_info(device_id, conn)
+	fmt.Printf("Dim level at start: %v, ", device_dim(device_id, conn))
 	req := canopus.NewRequest(canopus.MessageConfirmable, canopus.Put)
 	payload := fmt.Sprintf("{ \"3311\" : [{ \"5851\" : %v }] }", val)
 	req.SetStringPayload(payload)
@@ -266,7 +266,7 @@ func dim_device(device_id int, val int, conn canopus.Connection) {
 	req.SetRequestURI(ru)
 	_, err := conn.Send(req)
 	check(err)
-	device_info(device_id, conn)
+	fmt.Printf("dim level at end: %v\n", device_dim(device_id, conn))
 }
 
 func power_group(group_id int, val int, conn canopus.Connection) {
@@ -282,7 +282,7 @@ func power_group(group_id int, val int, conn canopus.Connection) {
 }
 
 func dim_group(group_id int, val int, conn canopus.Connection) {
-	group_info(group_id, conn)
+	fmt.Printf("Dim level at start: %v, ", group_dim(group_id, conn))
 	req := canopus.NewRequest(canopus.MessageConfirmable, canopus.Put)
 	payload := fmt.Sprintf("{ \"5851\": %d }", val)
 	req.SetStringPayload(payload)
@@ -290,7 +290,7 @@ func dim_group(group_id int, val int, conn canopus.Connection) {
 	req.SetRequestURI(ru)
 	_, err := conn.Send(req)
 	check(err)
-	group_info(group_id, conn)
+	fmt.Printf("dim level at end: %v\n", group_dim(group_id, conn))
 }
 
 func validate_flags() {
