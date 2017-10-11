@@ -67,7 +67,7 @@ var (
 	action      = flag.String("action", "status", "action to take [dim|status|power]).")
 	target      = flag.Int("target", 0, "Target value (0-100 for dim, 0 or 1 for power).")
 	target_id   = flag.Int("id", 65537, "Device or Group ID.")
-	target_name = flag.String("name", "noname", "Device or Group name")
+	target_name = flag.String("name", "", "Device or Group name")
 	steps       = flag.Int("steps", 10, "Number of intermediate steps for dim action.")
 	period      = flag.Int("period", 60, "Time period in seconds to run dim action over.")
 )
