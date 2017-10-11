@@ -1,0 +1,5 @@
+[ ] allow status and actions by name, not just by id
+[ ] investigate whether setting names is desired
+[ ] better go
+[ ] refactor into separate files (types, status, actions)
+[ ] refactor main()
