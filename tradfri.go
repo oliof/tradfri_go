@@ -12,8 +12,12 @@ import (
 )
 
 // types to unmarshal json data from tradfri
-// partially generated with https://mholt.github.io/json-to-go/
-// struct names derived from https://github.com/IPSO-Alliance/pub/blob/master/reg/README.md
+// generated with help from https://mholt.github.io/json-to-go/
+// struct names derived from 
+// - https://github.com/IPSO-Alliance/pub/blob/master/reg/README.md
+// - https://github.com/hardillb/TRADFRI2MQTT/blob/master/src/main/java/uk/me/hardill/TRADFRI2MQTT/TradfriConstants.java
+// - http://www.openmobilealliance.org/wp/OMNA/LwM2M/LwM2MRegistry.html#resources
+
 type device_ids []int
 type group_ids []int
 
