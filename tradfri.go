@@ -374,8 +374,7 @@ func main() {
 			fmt.Printf("difference per interval %v\n",
 				difference_per_interval)
 			new_dim := current_brightness
-			for i := 0; i <= *steps; i++ {
-				fmt.Printf("Step %v ", i)
+			for current_brightness != *value {
 				new_dim += difference_per_interval
 				if new_dim < *value && difference_per_interval < 0 {
 					new_dim = *value
@@ -390,8 +389,9 @@ func main() {
 				fmt.Printf(" new dim level %v\n", new_dim)
 				dim_device(*target_id, new_dim, conn)
 				time.Sleep(time.Duration(interval) * time.Second)
+				current_brightness = device_dim(*target_id, conn)
 			}
-			if device_dim(*target_id, conn) < 12 {
+			if current_brightness < 12 {
 				fmt.Printf("Minimum brightness reached, turning off device.")
 				power_device(*target_id, 0, conn)
 			}
@@ -404,8 +404,7 @@ func main() {
 			fmt.Printf("difference per interval %v\n",
 				difference_per_interval)
 			new_dim := current_brightness
-			for i := 0; i <= *steps; i++ {
-				fmt.Printf("Step %v ", i)
+			for current_brightness != *value {
 				new_dim += difference_per_interval
 				if new_dim < *value && difference_per_interval < 0 {
 					new_dim = *value
@@ -419,9 +418,10 @@ func main() {
 				}
 				fmt.Printf(" new dim level %v\n", new_dim)
 				dim_group(*target_id, new_dim, conn)
-				time.Sleep(time.Duration(interval)*time.Second)
+				time.Sleep(time.Duration(interval) * time.Second)
+				current_brightness = group_dim(*target_id, conn)
 			}
-			if group_dim(*target_id, conn) < 12 {
+			if current_brightness < 12 {
 				fmt.Printf("Minimum brightness reached, turning off group.")
 				power_group(*target_id, 0, conn)
 			}
