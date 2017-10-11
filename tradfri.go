@@ -6,6 +6,7 @@ import (
 	"fmt"
 	// "github.com/davecgh/go-spew/spew"
 	"os"
+	"path"
 	"time"
 
 	"github.com/vharitonsky/iniflags"
@@ -86,7 +87,7 @@ var (
 // process flags
 func init() {
 	flag.Usage = usage
-	iniflags.SetConfigFile("tradfri.ini")
+	iniflags.SetConfigFile(path.Join(os.GetEnv("HOME"),".tradfri.ini"))
 	iniflags.Parse()
 }
 
