@@ -13,7 +13,7 @@ import (
 
 // types to unmarshal json data from tradfri
 // generated with help from https://mholt.github.io/json-to-go/
-// struct names derived from 
+// struct names derived from
 // - https://github.com/IPSO-Alliance/pub/blob/master/reg/README.md
 // - https://github.com/hardillb/TRADFRI2MQTT/blob/master/src/main/java/uk/me/hardill/TRADFRI2MQTT/TradfriConstants.java
 // - http://www.openmobilealliance.org/wp/OMNA/LwM2M/LwM2MRegistry.html#resources
@@ -44,12 +44,12 @@ type device_desc struct {
 }
 
 type group_desc struct {
-	Power     int    `json:"5850"`
-	Dim       int    `json:"5851"`
-	GroupName string `json:"9001"`
-	Num9002   int    `json:"9002"`
-	GroupID   int    `json:"9003"`
-	AccessoryLink   struct {
+	Power         int    `json:"5850"`
+	Dim           int    `json:"5851"`
+	GroupName     string `json:"9001"`
+	Num9002       int    `json:"9002"`
+	GroupID       int    `json:"9003"`
+	AccessoryLink struct {
 		LinkedItems struct {
 			DeviceIDs []int `json:"9003"`
 		} `json:"15002"`
