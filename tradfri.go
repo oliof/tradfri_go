@@ -266,7 +266,7 @@ func dim_device(device_id int, val int, conn canopus.Connection) {
 }
 
 func power_group(group_id int, val int, conn canopus.Connection) {
-	group_info(group_id, conn)
+	group_power(group_id, conn)
 	req := canopus.NewRequest(canopus.MessageConfirmable, canopus.Put)
 	payload := fmt.Sprintf("{ \"5850\": %d }", val)
 	req.SetStringPayload(payload)
@@ -274,7 +274,7 @@ func power_group(group_id int, val int, conn canopus.Connection) {
 	req.SetRequestURI(ru)
 	_, err := conn.Send(req)
 	check(err)
-	group_info(group_id, conn)
+	group_power(group_id, conn)
 }
 
 func dim_group(group_id int, val int, conn canopus.Connection) {
