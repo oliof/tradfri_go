@@ -78,9 +78,9 @@ Dim level at start: 223, dim level at end: 224
 ## Known issues
 
  *   When using the `period` and `steps` flags, results are imprecise:  
-   * Because we may lose messages due to flood protection on the gateway, the
+ * * Because we may lose messages due to flood protection on the gateway, the
      loop doesn't always end up at exactly n steps.
-   * Because the way we compute the interval to dim by is imprecise, the loop
+ * * Because the way we compute the interval to dim by is imprecise, the loop
      doesn't always end up at exactly n steps.
  *   Running two instances ofg `tradfri`, one dimming down over a `period`, the
      other dimming up, will result in both running potentially for-ever.
