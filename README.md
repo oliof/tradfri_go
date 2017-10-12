@@ -74,24 +74,3 @@ Dim level at start: 204, dim level at end: 223
  new dim level 224
 Dim level at start: 223, dim level at end: 224
 ```
-
-
-
-
-
-allowMissingConfig = false  # Don't terminate the app if the ini file cannot be read.
-allowUnknownFlags = false  # Don't terminate the app if ini file contains unknown flags.
-configUpdateInterval = 0s  # Update interval for re-reading config file set via -config flag. Zero disables config file re-reading.
-color = false  # Set color for a device or group. 
-device = false  # Talk to a device
-dim = false  # Dim a device or group.
-gateway = 127.0.0.1  # Address of Tradfri gateway.
-group = false  # Talk to a group
-id = -1  # Device or Group ID.
-key = deadbeef  # API key to access gateway.
-name =   # Device or Group name
-period = 0  # Dim period in seconds. Will dim immediately if set to 0.
-power = false  # Modify power state of a device or group.
-status = false  # Show status of all Tradfri devices.
-steps = 10  # Number of intermediate steps for dim action.
-value = -1  # Target value (0-100 for dim, 0 or 1 for power).
