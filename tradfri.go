@@ -87,7 +87,9 @@ var (
 // process flags
 func init() {
 	flag.Usage = usage
-	iniflags.SetConfigFile(path.Join(os.Getenv("HOME"), ".tradfri.ini"))
+	inifile := path.Join(os.Getenv("HOME"), ".tradfri.ini")
+	fmt.Println(inifile)
+	iniflags.SetConfigFile(inifile)
 	iniflags.Parse()
 }
 
