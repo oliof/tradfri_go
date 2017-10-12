@@ -133,7 +133,7 @@ func list_groups(group_id_list group_ids, conn canopus.Connection) {
 	}
 }
 
-func group_description(group_id int, conn canopus.Connection) group_desc {
+func group_get_description(group_id int, conn canopus.Connection) group_desc {
 	var desc group_desc
 	req := canopus.NewRequest(canopus.MessageConfirmable, canopus.Get)
 	req.SetStringPayload("")
@@ -147,19 +147,19 @@ func group_description(group_id int, conn canopus.Connection) group_desc {
 }
 
 func group_info(group_id int, conn canopus.Connection) {
-	desc := group_description(group_id, conn)
+	desc := group_get_description(group_id, conn)
 	fmt.Printf("ID: %v, Name: %v\n", desc.GroupID, desc.GroupName)
 	fmt.Printf("Power: %v, Dim: %v\n", desc.Power, desc.Dim)
 	fmt.Printf("Members: %v\n", desc.AccessoryLink.LinkedItems.DeviceIDs)
 }
 
-func group_power(group_id int, conn canopus.Connection) int {
-	desc := group_description(group_id, conn)
+func group_get_power(group_id int, conn canopus.Connection) int {
+	desc := group_get_description(group_id, conn)
 	return desc.Power
 }
 
-func group_dim(group_id int, conn canopus.Connection) int {
-	desc := group_description(group_id, conn)
+func group_get_dim(group_id int, conn canopus.Connection) int {
+	desc := group_get_description(group_id, conn)
 	return desc.Dim
 }
 
@@ -190,7 +190,7 @@ func list_devices(device_id_list device_ids, conn canopus.Connection) {
 	}
 }
 
-func device_description(device_id int, conn canopus.Connection) device_desc {
+func device_get_description(device_id int, conn canopus.Connection) device_desc {
 	req := canopus.NewRequest(canopus.MessageConfirmable, canopus.Get)
 	req.SetStringPayload("")
 	ru := fmt.Sprintf("/15001/%v", device_id)
@@ -206,7 +206,7 @@ func device_description(device_id int, conn canopus.Connection) device_desc {
 
 func device_info(device_id int, conn canopus.Connection) {
 	var desc device_desc
-	desc = device_description(device_id, conn)
+	desc = device_get_description(device_id, conn)
 	fmt.Printf("ID: %v, Name; %v, Description: %v\n",
 		desc.DeviceID, desc.DeviceName, desc.Device.DeviceDescription)
 
@@ -221,8 +221,8 @@ func device_info(device_id int, conn canopus.Connection) {
 	}
 }
 
-func device_power(device_id int, conn canopus.Connection) int {
-	desc := device_description(device_id, conn)
+func device_get_power(device_id int, conn canopus.Connection) int {
+	desc := device_get_description(device_id, conn)
 	// tradfri lamps only have a single light control
 	if len(desc.LightControl) > 0 {
 		return desc.LightControl[0].Power
@@ -231,8 +231,8 @@ func device_power(device_id int, conn canopus.Connection) int {
 	}
 }
 
-func device_dim(device_id int, conn canopus.Connection) int {
-	desc := device_description(device_id, conn)
+func device_get_dim(device_id int, conn canopus.Connection) int {
+	desc := device_get_description(device_id, conn)
 	// tradfri lamps only have a single light control
 	if len(desc.LightControl) > 0 {
 		return desc.LightControl[0].Dim
@@ -241,7 +241,7 @@ func device_dim(device_id int, conn canopus.Connection) int {
 	}
 }
 
-func power_device(device_id int, val int, conn canopus.Connection) {
+func device_set_power(device_id int, val int, conn canopus.Connection) {
 	device_info(device_id, conn)
 	req := canopus.NewRequest(canopus.MessageConfirmable, canopus.Put)
 	payload := fmt.Sprintf("{ \"3311\" : [{ \"5850\" : %v }] }", val)
@@ -253,8 +253,8 @@ func power_device(device_id int, val int, conn canopus.Connection) {
 	device_info(device_id, conn)
 }
 
-func dim_device(device_id int, val int, conn canopus.Connection) {
-	fmt.Printf("Dim level at start: %v, ", device_dim(device_id, conn))
+func device_set_dim(device_id int, val int, conn canopus.Connection) {
+	fmt.Printf("Dim level at start: %v, ", device_get_dim(device_id, conn))
 	req := canopus.NewRequest(canopus.MessageConfirmable, canopus.Put)
 	payload := fmt.Sprintf("{ \"3311\" : [{ \"5851\" : %v }] }", val)
 	req.SetStringPayload(payload)
@@ -262,11 +262,11 @@ func dim_device(device_id int, val int, conn canopus.Connection) {
 	req.SetRequestURI(ru)
 	_, err := conn.Send(req)
 	check(err)
-	fmt.Printf("dim level at end: %v\n", device_dim(device_id, conn))
+	fmt.Printf("dim level at end: %v\n", device_get_dim(device_id, conn))
 }
 
-func power_group(group_id int, val int, conn canopus.Connection) {
-	group_power(group_id, conn)
+func group_set_power(group_id int, val int, conn canopus.Connection) {
+	group_get_power(group_id, conn)
 	req := canopus.NewRequest(canopus.MessageConfirmable, canopus.Put)
 	payload := fmt.Sprintf("{ \"5850\": %d }", val)
 	req.SetStringPayload(payload)
@@ -274,11 +274,11 @@ func power_group(group_id int, val int, conn canopus.Connection) {
 	req.SetRequestURI(ru)
 	_, err := conn.Send(req)
 	check(err)
-	group_power(group_id, conn)
+	group_get_power(group_id, conn)
 }
 
-func dim_group(group_id int, val int, conn canopus.Connection) {
-	fmt.Printf("Dim level at start: %v, ", group_dim(group_id, conn))
+func group_set_dim(group_id int, val int, conn canopus.Connection) {
+	fmt.Printf("Dim level at start: %v, ", group_get_dim(group_id, conn))
 	req := canopus.NewRequest(canopus.MessageConfirmable, canopus.Put)
 	payload := fmt.Sprintf("{ \"5851\": %d }", val)
 	req.SetStringPayload(payload)
@@ -286,7 +286,7 @@ func dim_group(group_id int, val int, conn canopus.Connection) {
 	req.SetRequestURI(ru)
 	_, err := conn.Send(req)
 	check(err)
-	fmt.Printf("dim level at end: %v\n", group_dim(group_id, conn))
+	fmt.Printf("dim level at end: %v\n", group_get_dim(group_id, conn))
 }
 
 func validate_flags() {
@@ -324,44 +324,44 @@ func main() {
 
 	if *power {
 		if *device && *value != -1 {
-			power_device(*target_id, *value, conn)
+			device_set_power(*target_id, *value, conn)
 		}
 		if *device && *value == -1 {
-			device_power(*target_id, conn)
+			device_get_power(*target_id, conn)
 		}
 
 		if *group && *value != -1 {
-			power_group(*target_id, *value, conn)
+			group_set_power(*target_id, *value, conn)
 		}
 		if *group && *value == -1 {
-			group_power(*target_id, conn)
+			group_get_power(*target_id, conn)
 		}
 	}
 
 	if *dim && *period == 0 {
 
 		if *device && *value != -1 {
-			dim_device(*target_id, *value, conn)
+			device_set_dim(*target_id, *value, conn)
 		}
 		if *device && *value == -1 {
-			device_dim(*target_id, conn)
+			device_get_dim(*target_id, conn)
 		}
 
-		// if device_dim(*target_id, conn) < 13 {
+		// if device_get_dim(*target_id, conn) < 13 {
 		//	fmt.Printf("Minimum brightness reached, turning off device.")
-		//	power_device(*target_id, 0, conn)
+		//	device_set_power(*target_id, 0, conn)
 		// }
 
 		if *group && *value != -1 {
-			dim_group(*target_id, *value, conn)
+			group_set_dim(*target_id, *value, conn)
 		}
 		if *group && *value == -1 {
-			group_dim(*target_id, conn)
+			group_get_dim(*target_id, conn)
 		}
 
-		// if group_dim(*target_id, conn) < 13 {
+		// if group_get_dim(*target_id, conn) < 13 {
 		//	fmt.Printf("Minimum brightness reached, turning off device.")
-		//	power_group(*target_id, 0, conn)
+		//	group_set_power(*target_id, 0, conn)
 		// }
 
 	}
@@ -370,7 +370,7 @@ func main() {
 		interval := int(*period / *steps)
 		fmt.Printf("dimming in %v %v second intervals, ", *steps, interval)
 		if *device {
-			current_brightness := device_dim(*target_id, conn)
+			current_brightness := device_get_dim(*target_id, conn)
 			difference := int(*value - current_brightness)
 			difference_per_interval := int(difference / *steps)
 			fmt.Printf("difference per interval %v\n",
@@ -384,24 +384,24 @@ func main() {
 				if new_dim > *value && difference_per_interval > 0 {
 					new_dim = *value
 				}
-				if new_dim > 12 && device_power(*target_id, conn) == 0 {
+				if new_dim > 12 && device_get_power(*target_id, conn) == 0 {
 					fmt.Println(
 						"Turning up dimmer on device that is powered down, powering up ...")
-					power_device(*target_id, 1, conn)
+					device_set_power(*target_id, 1, conn)
 				}
 				fmt.Printf(" new dim level %v\n", new_dim)
-				dim_device(*target_id, new_dim, conn)
+				device_set_dim(*target_id, new_dim, conn)
 				time.Sleep(time.Duration(interval) * time.Second)
-				current_brightness = device_dim(*target_id, conn)
+				current_brightness = device_get_dim(*target_id, conn)
 			}
 			if current_brightness < 12 {
 				fmt.Println("Minimum brightness reached, turning off device.")
-				power_device(*target_id, 0, conn)
+				device_set_power(*target_id, 0, conn)
 			}
 		}
 
 		if *group {
-			current_brightness := group_dim(*target_id, conn)
+			current_brightness := group_get_dim(*target_id, conn)
 			difference := int(*value - current_brightness)
 			difference_per_interval := int(difference / *steps)
 			fmt.Printf("difference per interval %v\n",
@@ -415,18 +415,18 @@ func main() {
 				if new_dim > *value && difference_per_interval > 0 {
 					new_dim = *value
 				}
-				if new_dim > 12 && group_power(*target_id, conn) == 0 {
+				if new_dim > 12 && group_get_power(*target_id, conn) == 0 {
 					fmt.Println("Turning up dimmer on group that is powered down, powering up ...")
-					power_group(*target_id, 1, conn)
+					group_set_power(*target_id, 1, conn)
 				}
 				fmt.Printf(" new dim level %v\n", new_dim)
-				dim_group(*target_id, new_dim, conn)
+				group_set_dim(*target_id, new_dim, conn)
 				time.Sleep(time.Duration(interval) * time.Second)
-				current_brightness = group_dim(*target_id, conn)
+				current_brightness = group_get_dim(*target_id, conn)
 			}
 			if current_brightness < 12 {
 				fmt.Println("Minimum brightness reached, turning off group.")
-				power_group(*target_id, 0, conn)
+				group_set_power(*target_id, 0, conn)
 			}
 		}
 	}
