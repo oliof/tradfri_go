@@ -59,13 +59,6 @@ type group_desc struct {
 	Num9039 int `json:"9039"`
 }
 
-// type to read the config file
-
-type tradfri_cfg struct {
-	Hubip string
-	Key   string
-}
-
 // flags
 var (
 	gateway     = flag.String("gateway", "127.0.0.1", "Address of Tradfri gateway.")
