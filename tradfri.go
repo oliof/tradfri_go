@@ -61,20 +61,28 @@ type group_desc struct {
 
 // flags
 var (
-	gateway     = flag.String("gateway", "127.0.0.1", "Address of Tradfri gateway.")
-	key         = flag.String("key", "deadbeef", "API key to access gateway.")
-	status      = flag.Bool("status", false, "Show status of all Tradfri devices.")
-	power       = flag.Bool("power", false, "Modify power state of a device or group.")
-	dim         = flag.Bool("dim", false, "Dim a device or group.")
-	color       = flag.Bool("color", false, "Set color for a device or group.")
-	device      = flag.Bool("device", false, "Talk to a device")
-	group       = flag.Bool("group", false, "Talk to a group")
-	value       = flag.Int("value", -1, "Target value (0-100 for dim, 0 or 1 for power).")
-	target_id   = flag.Int("id", -1, "Device or Group ID.")
-	target_name = flag.String("name", "", "Device or Group name")
+	gateway     = flag.String("gateway", "127.0.0.1",
+	        "Address of Tradfri gateway.")
+	key         = flag.String("key", "deadbeef",
+	        "API key to access gateway.")
+	status      = flag.Bool("status", false,
+	        "Show status of all Tradfri devices.")
+	power       = flag.Bool("power", false,
+	        "Modify power state of a device or group.")
+	dim         = flag.Bool("dim", false,
+	        "Dim a device or group.")
+	device      = flag.Bool("device", false,
+	        "Use a device")
+	group       = flag.Bool("group", false,
+	        "Use a group")
+	value       = flag.Int("value", -1,
+	        "Target value (0-100 for dim, 0 or 1 for power).")
+	target_id   = flag.Int("id", -1,
+	        "Device or Group ID.")
 	period      = flag.Int("period", 0,
 		"Dim period in seconds. Will dim immediately if set to 0.")
-	steps = flag.Int("steps", 10, "Number of intermediate steps for dim action.")
+	steps = flag.Int("steps",
+	        10, "Number of intermediate steps for dim action.")
 )
 
 // process flags
@@ -294,17 +302,16 @@ func validate_flags() {
 		usage()
 	}
 	if *device && *group {
-		panic("Only one of -device and -group should be set.")
+		fmt.Println("Only one of -device and -group should be set.")
+		usage()
 	}
 	if *device && *target_id == -1 {
-		if len(*target_name) < 1 {
-			panic("Need device id or name to run.")
-		}
+		fmt.Println("Need device id to run.")
+		usage()
 	}
 	if *group && *target_id == -1 {
-		if len(*target_name) < 1 {
-			panic("Need group id or name to run.")
-		}
+		fmt.Println("Need group id or name to run.")
+		usage()
 	}
 }
 
@@ -429,11 +436,5 @@ func main() {
 				group_set_power(*target_id, 0, conn)
 			}
 		}
-	}
-
-	if *color {
-		// TODO(hwa): Add color support when we have lamps that can change color.
-		fmt.Printf("set color to value %v on id %v\n",
-			*value, *target_id)
 	}
 }
