@@ -77,16 +77,16 @@ Dim level at start: 223, dim level at end: 224
 
 ## Known issues
 
- *   When using the `period` and `steps` flags, results are imprecise:  
+ * When using the `period` and `steps` flags, results are imprecise:  
    * Because we may lose messages due to flood protection on the gateway, the
      loop doesn't always end up at exactly n steps.
    * Because the way we compute the interval to dim by is imprecise, the loop
      doesn't always end up at exactly n steps.
- *   Running two instances ofg `tradfri`, one dimming down over a `period`, the
+ * Running two instances ofg `tradfri`, one dimming down over a `period`, the
      other dimming up, will result in both running potentially for-ever.
- *   There is no protection against other clients (i.e. remotes) modifying the
-     devices or group, which can also lead to changes in runtime or results on
-     long-running dim actions that are rather unexpected
- *   There are no sanity checks on any of the flags (other than checking for
-     non-sensical combinations). Proceed at your own risk!
+ * There is no protection against other clients (i.e. remotes) modifying the
+   devices or group, which can also lead to changes in runtime or results on
+   long-running dim actions that are rather unexpected
+ * There are no sanity checks on any of the flags (other than checking for
+   non-sensical combinations). Proceed at your own risk!
  
