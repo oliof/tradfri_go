@@ -298,7 +298,7 @@ func group_set_dim(group_id int, val int, conn canopus.Connection) {
 }
 
 func validate_flags() {
-	if !*status && !*power && !*dim && !*color {
+	if !*status && !*power && !*dim {
 		usage()
 	}
 	if *device && *group {
