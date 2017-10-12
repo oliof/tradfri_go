@@ -385,7 +385,8 @@ func main() {
 					new_dim = *value
 				}
 				if new_dim > 12 && device_power(*target_id, conn) == 0 {
-					fmt.Printf("Turning up dimmer on device that is powered down, powering up ...")
+					fmt.Println(
+						"Turning up dimmer on device that is powered down, powering up ...")
 					power_device(*target_id, 1, conn)
 				}
 				fmt.Printf(" new dim level %v\n", new_dim)
@@ -394,7 +395,7 @@ func main() {
 				current_brightness = device_dim(*target_id, conn)
 			}
 			if current_brightness < 12 {
-				fmt.Printf("Minimum brightness reached, turning off device.")
+				fmt.Println("Minimum brightness reached, turning off device.")
 				power_device(*target_id, 0, conn)
 			}
 		}
@@ -415,7 +416,7 @@ func main() {
 					new_dim = *value
 				}
 				if new_dim > 12 && group_power(*target_id, conn) == 0 {
-					fmt.Printf("Turning up dimmer on group that is powered down, powering up ...")
+					fmt.Println("Turning up dimmer on group that is powered down, powering up ...")
 					power_group(*target_id, 1, conn)
 				}
 				fmt.Printf(" new dim level %v\n", new_dim)
@@ -424,7 +425,7 @@ func main() {
 				current_brightness = group_dim(*target_id, conn)
 			}
 			if current_brightness < 12 {
-				fmt.Printf("Minimum brightness reached, turning off group.")
+				fmt.Println("Minimum brightness reached, turning off group.")
 				power_group(*target_id, 0, conn)
 			}
 		}
