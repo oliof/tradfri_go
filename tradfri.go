@@ -16,7 +16,6 @@ import (
 func init() {
 	flag.Usage = usage
 	inifile := path.Join(os.Getenv("HOME"), ".tradfri.ini")
-	fmt.Println(inifile)
 	iniflags.SetConfigFile(inifile)
 	iniflags.Parse()
 }
