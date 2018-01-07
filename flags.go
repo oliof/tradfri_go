@@ -1,4 +1,4 @@
-package tradfri_go
+package main
 
 import "flag"
 

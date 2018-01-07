@@ -1,4 +1,4 @@
-package tradfri_go
+package main
 
 import (
 	"encoding/json"
@@ -147,8 +147,8 @@ func device_info(device_id int, conn canopus.Connection) {
 	// only output light control info if available
 	if len(desc.LightControl) > 0 {
 		for count, entry := range desc.LightControl {
-			fmt.Printf("Light Control Set %v, Power: %v, Dim: %v\n",
-				count, entry.Power, entry.Dim)
+			fmt.Printf("Light Control Set %v, Power: %v, Dim: %v, 9003: %v\n",
+				count, entry.Power, entry.Dim, entry.Num9003)
 		}
 	} else {
 		fmt.Println("No light control values")
@@ -161,7 +161,7 @@ func device_get_power(device_id int, conn canopus.Connection) int {
 	if len(desc.LightControl) > 0 {
 		return desc.LightControl[0].Power
 	} else {
-		panic("No light control info found1")
+		panic("No light control info found!")
 	}
 }
 
@@ -171,7 +171,7 @@ func device_get_dim(device_id int, conn canopus.Connection) int {
 	if len(desc.LightControl) > 0 {
 		return desc.LightControl[0].Dim
 	} else {
-		panic("No light control info found1")
+		panic("No light control info found!")
 	}
 }
 

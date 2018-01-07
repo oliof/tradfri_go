@@ -1,4 +1,4 @@
-package tradfri_go
+package main
 
 // types to unmarshal json data from tradfri
 // generated with help from https://mholt.github.io/json-to-go/
