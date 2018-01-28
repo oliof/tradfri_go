@@ -150,8 +150,10 @@ func device_info(device_id int, conn canopus.Connection) {
         }
         if desc.ApplicationType == Lamp {
 		for count, entry := range desc.LightControl {
-			fmt.Printf("Light Control Set %v, Power: %v, Dim: %v, 9003: %v\n",
-				count, entry.Power, entry.Dim, entry.Num9003)
+			fmt.Printf("Light Control Set %v, Power: %v, Dim: %v\n",
+				count, entry.Power, entry.Dim)
+			fmt.Printf("Color Temperature: x %v / y %v, Color: %v (if 0, lamp does not support these)\n",
+				entry.ColorX, entry.ColorY, entry.Color)
 		}
 	}
         if *verbose {

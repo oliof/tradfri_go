@@ -20,12 +20,11 @@ type device_desc struct {
                 BatteryLevel          int    `json:"9"`
 	} `json:"3"`
 	LightControl []struct {
-                Color   int `json:"5706"` 
-                ColorX  int `json:"5709"`
-                ColorY  int `json:"5710"`
-		Power   int `json:"5850"`
-		Dim     int `json:"5851"`
-		Num9003 int `json:"9003"`
+                Color      int `json:"5706"`
+                ColorX     int `json:"5709"`
+                ColorY     int `json:"5710"`
+		Power      int `json:"5850"`
+		Dim        int `json:"5851"`
 	} `json:"3311"`
 	ApplicationType    int    `json:"5750"`
 	DeviceName         string `json:"9001"`
