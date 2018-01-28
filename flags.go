@@ -8,7 +8,7 @@ var (
 	key = flag.String("key", "deadbeef",
 		"API key to access gateway.")
 	status = flag.Bool("status", false,
-		"Show status of all Tradfri devices.")
+		"Show status of Tradfri devices. Will show all devices unless device id is set.")
 	power = flag.Bool("power", false,
 		"Modify power state of a device or group.")
 	dim = flag.Bool("dim", false,
@@ -23,6 +23,8 @@ var (
 		"Device or Group ID.")
 	period = flag.Int("period", 0,
 		"Dim period in seconds. Will dim immediately if set to 0.")
-	steps = flag.Int("steps",
-		10, "Number of intermediate steps for dim action.")
+	steps = flag.Int("steps", 10,
+                "Number of intermediate steps for dim action.")
+        verbose = flag.Bool("verbose", false,
+                "Enable verbose output.")
 )
