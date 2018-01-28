@@ -8,8 +8,10 @@ import (
 	"path"
 	"time"
 
+        "github.com/davecgh/go-spew/spew"
 	"github.com/vharitonsky/iniflags"
 	"github.com/zubairhamed/canopus"
+
 )
 
 // process flags
@@ -141,18 +143,20 @@ func device_get_description(device_id int, conn canopus.Connection) device_desc 
 func device_info(device_id int, conn canopus.Connection) {
 	var desc device_desc
 	desc = device_get_description(device_id, conn)
-	fmt.Printf("ID: %v, Name; %v, Description: %v\n",
-		desc.DeviceID, desc.DeviceName, desc.Device.DeviceDescription)
-
-	// only output light control info if available
-	if len(desc.LightControl) > 0 {
+	fmt.Printf("ID: %v, Name; %v, Description: %v, Type: %v\n",
+		desc.DeviceID, desc.DeviceName, desc.Device.DeviceDescription, desc.ApplicationType)
+        if desc.ApplicationType == Remote {
+                fmt.Printf( "Battery Level: %v\n", desc.Device.BatteryLevel)
+        }
+        if desc.ApplicationType == Lamp {
 		for count, entry := range desc.LightControl {
 			fmt.Printf("Light Control Set %v, Power: %v, Dim: %v, 9003: %v\n",
 				count, entry.Power, entry.Dim, entry.Num9003)
 		}
-	} else {
-		fmt.Println("No light control values")
 	}
+        if *verbose {
+               spew.Dump(desc)
+        }
 }
 
 func device_get_power(device_id int, conn canopus.Connection) int {
