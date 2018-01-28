@@ -95,7 +95,7 @@ Dim level at start: 223, dim level at end: 224
 - [ ] reduce duplicated code
 - [ ] sanity check options
 - [ ] allow status and actions by name, not just by id
-- [ ] add support for getting / setting color
+- [ ] add support for setting color temperature and color
 - [ ] investigate whether setting names is desired
 - [ ] better go
 - [ ] refactor into separate files (types, status, actions)
