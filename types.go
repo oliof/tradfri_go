@@ -27,20 +27,20 @@ type device_desc struct {
 		Dim     int `json:"5851"`
 		Num9003 int `json:"9003"`
 	} `json:"3311"`
-	ApplicationType int    `json:"5750"`
-	DeviceName      string `json:"9001"`
-	Num9002         int    `json:"9002"`
-	DeviceID        int    `json:"9003"`
-	Num9019         int    `json:"9019"`
-	Num9020         int    `json:"9020"`
-	Num9054         int    `json:"9054"`
+	ApplicationType    int    `json:"5750"`
+	DeviceName         string `json:"9001"`
+	CreatedAt          int    `json:"9002"`
+	DeviceID           int    `json:"9003"`
+	Reachability_state int    `json:"9019"`
+	LastSeen           int    `json:"9020"`
+	OTAUpdateState     int    `json:"9054"`
 }
 
 type group_desc struct {
 	Power         int    `json:"5850"`
 	Dim           int    `json:"5851"`
 	GroupName     string `json:"9001"`
-	Num9002       int    `json:"9002"`
+	CreatedAt     int    `json:"9002"`
 	GroupID       int    `json:"9003"`
 	AccessoryLink struct {
 		LinkedItems struct {
